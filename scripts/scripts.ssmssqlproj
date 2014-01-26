@@ -19,11 +19,11 @@
     </LogicalFolder>
     <LogicalFolder Name="Queries" Type="0" Sorted="true">
       <Items>
-        <FileNode Name="gather_data.sql">
+        <FileNode Name="gather_data.script.sql">
           <AssociatedConnectionMoniker>8c91a03d-f9b4-46c0-a305-b5dcc79ff907:WIN81DEV\SQLEXP2012DEV:True</AssociatedConnectionMoniker>
           <AssociatedConnSrvName>WIN81DEV\SQLEXP2012DEV</AssociatedConnSrvName>
           <AssociatedConnUserName />
-          <FullPath>gather_data.sql</FullPath>
+          <FullPath>gather_data.script.sql</FullPath>
         </FileNode>
       </Items>
     </LogicalFolder>
