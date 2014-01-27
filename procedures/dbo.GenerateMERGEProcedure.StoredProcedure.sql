@@ -8,7 +8,19 @@ ALTER PROCEDURE dbo.GenerateMERGEProcedure(
    )
 AS 
 /*
+** ============================================================================
+** General
+**    Proc Name:     GenerateMERGEProcedure
+**    Author:        T. Henry Nardo
+**    Date Created:  01/26/2014 (Original 05/13/2009)
+**    Purpose:       Procedure that will generate MERGE procedures for tables
+**                   in the database passed in parameter @database_name.
 **
+** Modification History
+**    Date        By   Modification
+**    ----------  ---  ------------
+**    MM/DD/YYYY  XXX  XXX...
+** ============================================================================
 */
 -- Local Variables and Program Data
 DECLARE
