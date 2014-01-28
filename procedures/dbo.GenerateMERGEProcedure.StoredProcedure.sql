@@ -103,7 +103,32 @@ BEGIN -- Begin Main Block
                  ('   @recs_inserted INT = 0,'), 
                  (' '),
                  ('-- Main T-SQL Block'),
-                 ('BEGIN -- Begin Main Block')
+                 ('BEGIN -- Begin Main Block'),
+                 ('   SET NOCOUNT ON'),
+                 (' '),
+                 ('   -- Set Audit Information'),
+                 ('   SET @audit_user = 1'),
+                 ('   SET @audit_date = getDate()'),
+                 (' '),
+                 ('   -- Load Status Information'),
+                 ('   SET @table_name = '''+@table_name+''''),
+                 ('   SET @program_unit = '''+@proc_name+''''),
+                 ('   SET @pu_type = ''SP'''),
+                 ('   SET @dbname = DB_Name()'),
+                 ('   SET @start_date = @audit_date'),
+                 ('   SET @system_name = @dbname'),
+                 ('   PRINT @program_unit'),
+                 (' '),
+                 ('   -- Get the count of records before processing'),
+                 ('   SELECT @prev_rec_count = COUNT(*)'),
+                 ('     FROM dbo.'+@table_name+''),
+                 (' '),
+                 ('   PRINT ''   Previous Record Count = ''+CONVERT(VARCHAR(30), @prev_rec_count)'),
+                 (' '),
+                 ('   --Check if the table exists and drop it'),
+                 ('   IF OBJECT_ID(''tempdb..#'+@table_name+''+''')'' IS NOT NULL'),
+                 ('      DROP TABLE #'+@table_name+''),
+                 (' ')
              ) tmp (line_value)
 
 

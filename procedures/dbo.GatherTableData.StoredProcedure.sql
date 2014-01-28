@@ -42,35 +42,22 @@ BEGIN -- Begin Main Block
       column_name VARCHAR(150),
       is_identity BIT,
       ordinal_position INT,
-      column_default VARCHAR(150),
-      data_type VARCHAR(150),
-      char_max_len INT,
-      numeric_precision INT,
-      numeric_scale INT,
-      domain_name VARCHAR(150),
+--      column_default VARCHAR(150),
+--      data_type VARCHAR(150),
+--      char_max_len INT,
+--      numeric_precision INT,
+--      numeric_scale INT,
+--      domain_name VARCHAR(150),
       dt_derived VARCHAR(150),
-      column_name_and_data_type_derived VARCHAR(150),
-      derived_data_type VARCHAR(150),
+--      column_name_and_data_type_derived VARCHAR(150),
+--      derived_data_type VARCHAR(150),
       is_nullable BIT,
       is_first_column BIT,
       is_last_column BIT,
+      is_pk_column BIT DEFAULT 0,
       table_schema VARCHAR(150),
       table_desc VARCHAR(500),
       column_desc VARCHAR(500)
-      )
-
-   -- create temp table
-   CREATE TABLE ##PKColumns(
-      table_schema VARCHAR(150),
-      table_name VARCHAR(150),
-      column_name VARCHAR(150)
-      )
-
-   -- create temp table
-   CREATE TABLE ##NonPKColumns(
-      table_name VARCHAR(150),
-      column_name VARCHAR(150),
-      ordinal_position INT
       )
 
    EXECUTE('
@@ -132,19 +119,22 @@ BEGIN -- Begin Main Block
                C.ORDINAL_POSITION'
          )
 
-   EXECUTE('INSERT INTO ##PKColumns
-               (table_schema, table_name, column_name)
-            SELECT KCU.TABLE_SCHEMA AS table_schema,
-                   KCU.TABLE_NAME AS table_name,
-                   KCU.COLUMN_NAME AS column_name
-              FROM '+@database_name+'.INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU
-                   JOIN '+@database_name+'.INFORMATION_SCHEMA.TABLE_CONSTRAINTS TC
-                     ON TC.TABLE_SCHEMA = KCU.TABLE_SCHEMA
-                    AND TC.TABLE_NAME = KCU.TABLE_NAME
-                    AND TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME
-             WHERE TC.CONSTRAINT_TYPE = ''PRIMARY KEY''
-           '
-          )
-      
+   EXECUTE('UPDATE ##TableData
+               SET is_pk_column = 1
+              FROM ##TableData TD
+                   JOIN (SELECT KCU.TABLE_SCHEMA AS table_schema,
+                                KCU.TABLE_NAME AS table_name,
+                                KCU.COLUMN_NAME AS column_name
+                           FROM '+@database_name+'.INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU
+                                JOIN '+@database_name+'.INFORMATION_SCHEMA.TABLE_CONSTRAINTS TC
+                                  ON TC.TABLE_SCHEMA = KCU.TABLE_SCHEMA
+                                 AND TC.TABLE_NAME = KCU.TABLE_NAME
+                                 AND TC.CONSTRAINT_NAME = KCU.CONSTRAINT_NAME
+                          WHERE TC.CONSTRAINT_TYPE = ''PRIMARY KEY''
+                        ) tmp
+                     ON tmp.table_schema = TD.table_schema
+                    AND tmp.table_name = TD.table_name
+                    AND tmp.column_name = TD.column_name'
+          )      
 
 END -- End Main Block
