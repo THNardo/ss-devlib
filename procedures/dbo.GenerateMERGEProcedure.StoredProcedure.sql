@@ -53,17 +53,30 @@ BEGIN -- Begin Main Block
       line_value VARCHAR(200)
    )
 
-   DECLARE TableDataCur CURSOR
+   DECLARE TableCur CURSOR
    FOR SELECT DISTINCT 
               table_name
          FROM ##TableData
        ORDER BY table_name
 
+   DECLARE TableDataCur CURSOR
+   FOR SELECT column_name,
+              is_identity,
+              ordinal_position,
+              dt_derived,
+              is_nullable,
+              is_last_column
+         FROM ##TableData
+        WHERE table_name = ''
+          AND is_identity = 0
+          AND @table_name <> 'error_log'
+       ORDER BY ordinal_position
+
    --DECLARE @table_name VARCHAR(150)
 
-   OPEN TableDataCur
+   OPEN TableCur
 
-   FETCH NEXT FROM TableDataCur INTO @table_name
+   FETCH NEXT FROM TableCur INTO @table_name
 
    WHILE( @@FETCH_STATUS = 0 )
    BEGIN
@@ -128,7 +141,33 @@ BEGIN -- Begin Main Block
                  ('   --Check if the table exists and drop it'),
                  ('   IF OBJECT_ID(''tempdb..#'+@table_name+''+''')'' IS NOT NULL'),
                  ('      DROP TABLE #'+@table_name+''),
-                 (' ')
+                 (' '),
+                 ('   -- Create temp table'),
+                 ('   CREATE TABLE #'+@table_name+' (')
+
+
+                 --('   OPEN TableDataCur'),
+                 --('   SET @CharString = '''),
+                 --(' '),
+                 --('   FETCH NEXT FROM TableDataCur INTO @column_name,'),
+                 --('                                     @ordinal_position,'),
+                 --('                                     @column_default,'),
+                 --('                                     @dt_derived,'),
+                 --('                                     @is_nullable,'),
+                 --('                                     @is_last_column'),
+                 --('   WHILE( @@FETCH_STATUS = 0 )'),
+                 --('   BEGIN'),
+                 --('      SET @CharString = '      '+@column_name'),
+                 --(' '),
+                 --('      FETCH NEXT FROM TableDataCur INTO @column_name,'),
+                 --('                                        @ordinal_position,'),
+                 --('                                        @column_default,'),
+                 --('                                        @dt_derived,'),
+                 --('                                        @is_nullable,'),
+                 --('                                        @is_last_column'),
+                 --('      SET @CharString = '''),
+                 --('   END'),
+                 --('   CLOSE TableDataCur'),
              ) tmp (line_value)
 
 
@@ -143,9 +182,9 @@ BEGIN -- Begin Main Block
              ) tmp (line_value)
 
 
-      FETCH NEXT FROM TableDataCur INTO @table_name
+      FETCH NEXT FROM TableCur INTO @table_name
    END
 
-   CLOSE TableDataCur
-   DEALLOCATE TableDataCur
+   CLOSE TableCur
+   DEALLOCATE TableCur
 END -- End Main Block
